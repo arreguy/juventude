@@ -68,3 +68,4 @@ out/
 .claude/
 claude.md
 plan.md
+apps/api/src/main/resources/db/migration/V4__20250820_140000__insert_production_data.sql

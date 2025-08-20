@@ -1,18 +1,23 @@
-version: '3.8'
-
 services:
   postgres-juventude:
-    image: postgres:latest
+    image: postgres:15-alpine
     container_name: juventude-db-container
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: juventude_db
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=C"
     ports:
       - "5432:5432"
     volumes:
       - juventude_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
 
 volumes:
   juventude_pgdata:
-    name: juventude_pgdata
+    driver: local

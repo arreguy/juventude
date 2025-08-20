@@ -81,8 +81,8 @@ export default function MembersPage() {
       const [membersResponse, ministriesResponse] = await Promise.all([ fetch(`/api/membros`), fetch("/api/ministerios") ]);
       const membersData = await membersResponse.json();
       const ministriesData = await ministriesResponse.json();
-      setMembers(membersData);
-      setMinistries(ministriesData);
+      setMembers(Array.isArray(membersData) ? membersData : []);
+      setMinistries(Array.isArray(ministriesData) ? ministriesData : []);
     } catch (error) { console.error("Erro ao carregar dados:", error); }
     finally { setLoading(false); }
   }
@@ -194,7 +194,7 @@ export default function MembersPage() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Todos os Ministérios</SelectItem>
-                  {ministries.map((m) => (<SelectItem key={m.id} value={m.id.toString()}>{formatMinistryName(m.nome)}</SelectItem>))}
+                  {ministries?.map((m) => (<SelectItem key={m.id} value={m.id.toString()}>{formatMinistryName(m.nome)}</SelectItem>))}
                 </SelectContent>
               </Select>
             </div>

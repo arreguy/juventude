@@ -1,21 +1,16 @@
 -- Create indexes for better query performance
 
--- Indexes for membros table
-CREATE INDEX idx_membros_nome ON membros(nome);
-CREATE INDEX idx_membros_ativo ON membros(ativo);
-CREATE INDEX idx_membros_created_at ON membros(created_at);
-CREATE INDEX idx_membros_data_nascimento ON membros(data_nascimento);
+-- Indexes for membro table (singular)
+CREATE INDEX idx_membro_nome ON membro(nome);
+CREATE INDEX idx_membro_ativo ON membro(ativo);
+CREATE INDEX idx_membro_data_nascimento ON membro(data_nascimento);
 
--- Indexes for ministerios table
-CREATE INDEX idx_ministerios_nome ON ministerios(nome);
-CREATE INDEX idx_ministerios_ativo ON ministerios(ativo);
-CREATE INDEX idx_ministerios_created_at ON ministerios(created_at);
+-- Indexes for ministerio table (singular)
+CREATE INDEX idx_ministerio_nome ON ministerio(nome);
 
--- Indexes for eventos table
-CREATE INDEX idx_eventos_nome ON eventos(nome);
-CREATE INDEX idx_eventos_ativo ON eventos(ativo);
-CREATE INDEX idx_eventos_data_evento ON eventos(data_evento);
-CREATE INDEX idx_eventos_created_at ON eventos(created_at);
+-- Indexes for evento table (singular)
+CREATE INDEX idx_evento_categoria ON evento(categoria);
+CREATE INDEX idx_evento_data ON evento(data);
 
 -- Indexes for junction tables
 CREATE INDEX idx_membro_ministerio_membro_id ON membro_ministerio(membro_id);

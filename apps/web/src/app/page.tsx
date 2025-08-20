@@ -8,8 +8,12 @@ import { Users, Calendar, BarChart3, Settings } from "lucide-react"
 async function getStats(path: string): Promise<number> {
   try {
     // Usamos 'no-store' para garantir que os dados sejam sempre os mais recentes
-    // Note a mudança para o caminho relativo '/api/...'
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${path}`, { cache: 'no-store' });
+    // Para server-side, usamos a URL completa do backend
+    const apiUrl = process.env.NODE_ENV === 'development' 
+      ? `http://localhost:8080${path}` 
+      : `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'}${path}`;
+    
+    const response = await fetch(apiUrl, { cache: 'no-store' });
     if (!response.ok) {
       console.error(`Erro ao buscar ${path}:`, response.statusText);
       return 0; // Retorna 0 em caso de erro na resposta
@@ -25,14 +29,11 @@ async function getStats(path: string): Promise<number> {
 
 // Transformamos o componente em uma função assíncrona
 export default async function HomePage() {
-  // Define a URL base da API para o lado do servidor
-  process.env.NEXT_PUBLIC_API_URL = "http://localhost:8080";
-
   // Busca todos os dados em paralelo para melhor performance
   const [membersCount, ministriesCount, eventsCount] = await Promise.all([
-    getStats("/membros"),
-    getStats("/ministerios"),
-    getStats("/eventos"),
+    getStats("/api/membros"),
+    getStats("/api/ministerios"),
+    getStats("/api/eventos"),
   ]);
 
   const quickActions = [
