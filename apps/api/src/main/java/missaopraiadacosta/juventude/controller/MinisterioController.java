@@ -5,11 +5,14 @@ import missaopraiadacosta.juventude.model.Ministerio;
 import missaopraiadacosta.juventude.service.MinisterioService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/ministerios")
+@RequestMapping("/api/ministerios")
+@Tag(name = "Ministérios", description = "Gerenciamento de ministérios da juventude")
 public class MinisterioController {
 
     private final MinisterioService ministerioService;
@@ -19,15 +22,16 @@ public class MinisterioController {
     }
 
     @GetMapping
+    @Operation(summary = "Listar ministérios", description = "Lista todos os ministérios disponíveis")
     public ResponseEntity<List<MinisterioDto>> listarTodos() {
         List<MinisterioDto> ministerios = ministerioService.listarTodos();
         return ResponseEntity.ok(ministerios);
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Buscar ministério por ID", description = "Busca um ministério específico pelo ID")
     public ResponseEntity<Ministerio> buscarPorId(@PathVariable Integer id) {
-        return ministerioService.buscarPorId(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        Ministerio ministerio = ministerioService.buscarPorId(id);
+        return ResponseEntity.ok(ministerio);
     }
 }

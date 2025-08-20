@@ -1,6 +1,7 @@
+# === Gradle/Spring Boot ===
 HELP.md
 .gradle
-build/
+**/build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
@@ -17,13 +18,22 @@ bin/
 !**/src/main/**/bin/
 !**/src/test/**/bin/
 
-# === Node / Next.js ===
-client/node_modules/
-client/.next/
+# === Node.js / Next.js ===
+node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
+.pnpm-debug.log*
+
+# Next.js
+.next/
+out/
+dist/
+
+# Production builds
+build/
+*.tsbuildinfo
 
 ### IntelliJ IDEA ###
 .idea
@@ -43,6 +53,7 @@ out/
 
 ### VS Code ###
 .vscode/
+
 # === Arquivos temporários ===
 *.tmp
 *.temp
@@ -54,3 +65,6 @@ out/
 .env.*
 !.env.example
 
+.claude/
+claude.md
+plan.md

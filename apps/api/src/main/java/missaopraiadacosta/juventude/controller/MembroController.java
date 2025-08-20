@@ -7,12 +7,14 @@ import missaopraiadacosta.juventude.service.MembroService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
-@RequestMapping("/membros")
+@RequestMapping("/api/membros")
+@Tag(name = "Membros", description = "Gerenciamento de membros da juventude")
 public class MembroController {
 
     private final MembroService membroService;
@@ -22,72 +24,47 @@ public class MembroController {
     }
 
     @PostMapping
+    @Operation(summary = "Criar novo membro", description = "Cria um novo membro da juventude")
     public ResponseEntity<Membro> criarMembro(@Valid @RequestBody MembroDto membroDto) {
-        try {
-            Membro novoMembro = membroService.criarMembro(membroDto);
-            return ResponseEntity.status(HttpStatus.CREATED).body(novoMembro);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
+        Membro novoMembro = membroService.criarMembro(membroDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(novoMembro);
     }
 
     @GetMapping
+    @Operation(summary = "Listar membros", description = "Lista todos os membros ou apenas os ativos")
     public ResponseEntity<List<Membro>> listarTodos(@RequestParam(required = false) Boolean apenasAtivos) {
-        try {
-            List<Membro> membros = (apenasAtivos != null && apenasAtivos)
-                    ? membroService.listarAtivos()
-                    : membroService.listarTodos();
-            return ResponseEntity.ok(membros);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+        List<Membro> membros = (apenasAtivos != null && apenasAtivos)
+                ? membroService.listarAtivos()
+                : membroService.listarTodos();
+        return ResponseEntity.ok(membros);
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Buscar membro por ID", description = "Busca um membro específico pelo ID")
     public ResponseEntity<Membro> buscarPorId(@PathVariable Integer id) {
-        try {
-            Optional<Membro> membro = membroService.buscarPorId(id);
-            return membro.map(ResponseEntity::ok)
-                    .orElse(ResponseEntity.notFound().build());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+        Membro membro = membroService.buscarPorId(id);
+        return ResponseEntity.ok(membro);
     }
 
     @PutMapping("/{id}")
+    @Operation(summary = "Atualizar membro", description = "Atualiza os dados de um membro existente")
     public ResponseEntity<Membro> atualizarMembro(@PathVariable Integer id,
                                                   @Valid @RequestBody MembroDto membroDto) {
-        try {
-            Membro membroAtualizado = membroService.atualizarMembro(id, membroDto);
-            return ResponseEntity.ok(membroAtualizado);
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
+        Membro membroAtualizado = membroService.atualizarMembro(id, membroDto);
+        return ResponseEntity.ok(membroAtualizado);
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "Deletar membro", description = "Remove um membro do sistema")
     public ResponseEntity<Void> deletarMembro(@PathVariable Integer id) {
-        try {
-            membroService.deletarMembro(id);
-            return ResponseEntity.noContent().build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+        membroService.deletarMembro(id);
+        return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/{id}/inativar")
+    @Operation(summary = "Inativar membro", description = "Marca um membro como inativo")
     public ResponseEntity<Void> inativarMembro(@PathVariable Integer id) {
-        try {
-            membroService.inativarMembro(id);
-            return ResponseEntity.ok().build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+        membroService.inativarMembro(id);
+        return ResponseEntity.ok().build();
     }
 }
