@@ -7,6 +7,10 @@ import java.util.Set;
 
 @Entity
 @Data
+@NamedEntityGraph(
+    name = "Membro.withMinisterios",
+    attributeNodes = @NamedAttributeNode("ministerios")
+)
 public class Membro {
 
     @Id
