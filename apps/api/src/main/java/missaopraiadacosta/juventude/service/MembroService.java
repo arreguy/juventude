@@ -2,6 +2,7 @@ package missaopraiadacosta.juventude.service;
 
 import jakarta.transaction.Transactional;
 import missaopraiadacosta.juventude.dto.MembroDto;
+import missaopraiadacosta.juventude.dto.response.MembroResponse;
 import missaopraiadacosta.juventude.exception.MembroNotFoundException;
 import missaopraiadacosta.juventude.exception.MinisterioNotFoundException;
 import missaopraiadacosta.juventude.mappers.MembroMapper;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class MembroService {
@@ -29,44 +31,62 @@ public class MembroService {
     }
 
     @Transactional
-    public Membro criarMembro(MembroDto membroDto) {
+    public MembroResponse criarMembro(MembroDto membroDto) {
         Membro membro = new Membro();
         Set<Ministerio> ministerios = getMinisteriosFromIds(membroDto.getMinisterioIds());
         membroMapper.toEntity(membroDto, membro, ministerios);
-        return membroRepository.save(membro);
+        Membro savedMembro = membroRepository.save(membro);
+        return membroMapper.toResponse(savedMembro);
     }
 
     @Transactional
-    public Membro atualizarMembro(Integer id, MembroDto membroDto) {
+    public MembroResponse atualizarMembro(Integer id, MembroDto membroDto) {
         Membro membro = membroRepository.findById(id)
                 .orElseThrow(() -> new MembroNotFoundException(id));
         Set<Ministerio> ministerios = getMinisteriosFromIds(membroDto.getMinisterioIds());
         membroMapper.toEntity(membroDto, membro, ministerios);
-        return membroRepository.save(membro);
+        Membro savedMembro = membroRepository.save(membro);
+        return membroMapper.toResponse(savedMembro);
     }
 
     private Set<Ministerio> getMinisteriosFromIds(Set<Integer> ministerioIds) {
         if (ministerioIds == null || ministerioIds.isEmpty()) return null;
-        Set<Ministerio> ministerios = new HashSet<>();
-        for (Integer ministerioId : ministerioIds) {
-            Ministerio ministerio = ministerioRepository.findById(ministerioId)
-                    .orElseThrow(() -> new MinisterioNotFoundException(ministerioId));
-            ministerios.add(ministerio);
+        
+        // Batch fetch all ministries to avoid N+1 queries
+        List<Ministerio> foundMinisterios = ministerioRepository.findAllById(ministerioIds);
+        
+        // Validate all IDs were found
+        if (foundMinisterios.size() != ministerioIds.size()) {
+            Set<Integer> foundIds = foundMinisterios.stream()
+                .map(Ministerio::getId)
+                .collect(Collectors.toSet());
+            Set<Integer> missingIds = ministerioIds.stream()
+                .filter(id -> !foundIds.contains(id))
+                .collect(Collectors.toSet());
+            throw new MinisterioNotFoundException(missingIds.iterator().next());
         }
-        return ministerios;
+        
+        return new HashSet<>(foundMinisterios);
     }
 
-    public Membro buscarPorId(Integer id) {
-        return membroRepository.findById(id)
+    public MembroResponse buscarPorId(Integer id) {
+        Membro membro = membroRepository.findById(id)
                 .orElseThrow(() -> new MembroNotFoundException(id));
+        return membroMapper.toResponse(membro);
     }
 
-    public List<Membro> listarTodos() {
-        return membroRepository.findAll();
+    public List<MembroResponse> listarTodos() {
+        List<Membro> membros = membroRepository.findAll();
+        return membros.stream()
+            .map(membroMapper::toResponse)
+            .collect(Collectors.toList());
     }
 
-    public List<Membro> listarAtivos() {
-        return membroRepository.findByAtivoTrue();
+    public List<MembroResponse> listarAtivos() {
+        List<Membro> membros = membroRepository.findByAtivoTrue();
+        return membros.stream()
+            .map(membroMapper::toResponse)
+            .collect(Collectors.toList());
     }
 
     @Transactional
