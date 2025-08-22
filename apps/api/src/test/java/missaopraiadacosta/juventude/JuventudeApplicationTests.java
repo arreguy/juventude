@@ -15,10 +15,12 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 class JuventudeApplicationTests {
 
 	@Container
-	static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:15-alpine")
+	@SuppressWarnings("resource")
+	static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:15-alpine")
 			.withDatabaseName("juventude_test")
 			.withUsername("test")
-			.withPassword("test");
+			.withPassword("test")
+			.withReuse(true);
 
 	@DynamicPropertySource
 	static void configureProperties(DynamicPropertyRegistry registry) {

@@ -10,6 +10,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
@@ -24,11 +25,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Testcontainers
 class MembroControllerTest {
 
+    @SuppressWarnings("resource")
     @Container
-    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:15-alpine")
+    static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:15-alpine")
             .withDatabaseName("juventude_test")
             .withUsername("test")
-            .withPassword("test");
+            .withPassword("test")
+            .withReuse(true);
 
     @DynamicPropertySource
     static void configureProperties(DynamicPropertyRegistry registry) {
@@ -40,12 +43,11 @@ class MembroControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @MockitoBean
     private MembroService membroService;
 
     @Test
     void deveBuscarMembroPorId() throws Exception {
-        // Given
         MembroResponse membroResponse = MembroResponse.builder()
             .id(1)
             .nome("João Silva")
@@ -54,7 +56,6 @@ class MembroControllerTest {
 
         when(membroService.buscarPorId(1)).thenReturn(membroResponse);
 
-        // When & Then
         mockMvc.perform(get("/api/membros/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
@@ -64,10 +65,8 @@ class MembroControllerTest {
 
     @Test
     void deveRetornar404QuandoMembroNaoExistir() throws Exception {
-        // Given
         when(membroService.buscarPorId(999)).thenThrow(new MembroNotFoundException(999));
 
-        // When & Then
         mockMvc.perform(get("/api/membros/999"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.status").value(404))
