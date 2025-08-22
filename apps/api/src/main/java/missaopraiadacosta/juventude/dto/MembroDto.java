@@ -1,8 +1,6 @@
 package missaopraiadacosta.juventude.dto;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Past;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.Data;
 
 import java.time.LocalDate;
@@ -15,14 +13,19 @@ public class MembroDto {
     @Size(min = 2, max = 100, message = "O nome deve ter entre 2 e 100 caracteres")
     private String nome;
 
+    @Min(value = 0, message = "Idade deve ser maior que 0")
+    @Max(value = 120, message = "Idade deve ser menor que 120")
     private Integer idade;
 
     @Past(message = "Data de nascimento inválida")
     private LocalDate dataNascimento;
 
     @Size(max = 15, message = "Número de telefone muito longo")
+    @Pattern(regexp = "^[\\d\\s\\-\\(\\)\\+]*$", message = "Formato de telefone inválido")
     private String telefone;
 
     private Boolean ativo;
-    private Set<Integer> ministerioIds;
+    
+    @Size(max = 10, message = "Máximo de 10 ministérios por membro")
+    private Set<@Positive(message = "ID do ministério deve ser positivo") Integer> ministerioIds;
 }
