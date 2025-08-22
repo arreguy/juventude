@@ -2,7 +2,7 @@ package missaopraiadacosta.juventude.controller;
 
 import jakarta.validation.Valid;
 import missaopraiadacosta.juventude.dto.MembroDto;
-import missaopraiadacosta.juventude.model.Membro;
+import missaopraiadacosta.juventude.dto.response.MembroResponse;
 import missaopraiadacosta.juventude.service.MembroService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,15 +25,15 @@ public class MembroController {
 
     @PostMapping
     @Operation(summary = "Criar novo membro", description = "Cria um novo membro da juventude")
-    public ResponseEntity<Membro> criarMembro(@Valid @RequestBody MembroDto membroDto) {
-        Membro novoMembro = membroService.criarMembro(membroDto);
+    public ResponseEntity<MembroResponse> criarMembro(@Valid @RequestBody MembroDto membroDto) {
+        MembroResponse novoMembro = membroService.criarMembro(membroDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(novoMembro);
     }
 
     @GetMapping
     @Operation(summary = "Listar membros", description = "Lista todos os membros ou apenas os ativos")
-    public ResponseEntity<List<Membro>> listarTodos(@RequestParam(required = false) Boolean apenasAtivos) {
-        List<Membro> membros = (apenasAtivos != null && apenasAtivos)
+    public ResponseEntity<List<MembroResponse>> listarTodos(@RequestParam(required = false) Boolean apenasAtivos) {
+        List<MembroResponse> membros = (apenasAtivos != null && apenasAtivos)
                 ? membroService.listarAtivos()
                 : membroService.listarTodos();
         return ResponseEntity.ok(membros);
@@ -41,16 +41,16 @@ public class MembroController {
 
     @GetMapping("/{id}")
     @Operation(summary = "Buscar membro por ID", description = "Busca um membro específico pelo ID")
-    public ResponseEntity<Membro> buscarPorId(@PathVariable Integer id) {
-        Membro membro = membroService.buscarPorId(id);
+    public ResponseEntity<MembroResponse> buscarPorId(@PathVariable Integer id) {
+        MembroResponse membro = membroService.buscarPorId(id);
         return ResponseEntity.ok(membro);
     }
 
     @PutMapping("/{id}")
     @Operation(summary = "Atualizar membro", description = "Atualiza os dados de um membro existente")
-    public ResponseEntity<Membro> atualizarMembro(@PathVariable Integer id,
-                                                  @Valid @RequestBody MembroDto membroDto) {
-        Membro membroAtualizado = membroService.atualizarMembro(id, membroDto);
+    public ResponseEntity<MembroResponse> atualizarMembro(@PathVariable Integer id,
+                                                          @Valid @RequestBody MembroDto membroDto) {
+        MembroResponse membroAtualizado = membroService.atualizarMembro(id, membroDto);
         return ResponseEntity.ok(membroAtualizado);
     }
 
