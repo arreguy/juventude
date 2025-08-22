@@ -1,7 +1,7 @@
 package missaopraiadacosta.juventude.controller;
 
+import missaopraiadacosta.juventude.dto.response.MembroResponse;
 import missaopraiadacosta.juventude.exception.MembroNotFoundException;
-import missaopraiadacosta.juventude.model.Membro;
 import missaopraiadacosta.juventude.service.MembroService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,12 +46,13 @@ class MembroControllerTest {
     @Test
     void deveBuscarMembroPorId() throws Exception {
         // Given
-        Membro membro = new Membro();
-        membro.setId(1);
-        membro.setNome("João Silva");
-        membro.setAtivo(true);
+        MembroResponse membroResponse = MembroResponse.builder()
+            .id(1)
+            .nome("João Silva")
+            .ativo(true)
+            .build();
 
-        when(membroService.buscarPorId(1)).thenReturn(membro);
+        when(membroService.buscarPorId(1)).thenReturn(membroResponse);
 
         // When & Then
         mockMvc.perform(get("/api/membros/1"))
